@@ -27,12 +27,19 @@ async def chess(ctx):
 
 @bot.command()
 async def playmusic(ctx, *, song):
-    music_bot_channel = bot.get_channel(music_bot_channel_id)
-    if music_bot_channel:
-        await ctx.send(f"Playing {song}...")
-        await music_bot_channel.send(f"-play {song}")
+    # Get the voice channel the user is in
+    user_voice_channel = ctx.author.voice.channel if ctx.author.voice else None
+    if user_voice_channel:
+        music_bot_channel = bot.get_channel(music_bot_channel_id)
+        if music_bot_channel:
+            await ctx.send(f"Playing {song} in {user_voice_channel.name}...")
+            # Tell the music bot to join the voice channel and play the song
+            await music_bot_channel.send(f"-join {user_voice_channel.name}")
+            await music_bot_channel.send(f"-play {song}")
+        else:
+            await ctx.send("Music channel not found. Double-check the channel ID.")
     else:
-        await ctx.send("Music channel not found. Double-check the channel ID.")
+        await ctx.send("You need to be in a voice channel to play music.")
 
 @bot.command()
 async def stopmusic(ctx):
